@@ -399,7 +399,9 @@
       "def": "120",
       "spd": "120",
       "dex": "120"
-    },
+    }
+      ],
+  "WAR Chain List 2": [
     {
       "name": "hussler_00",
       "id": "516870",
@@ -819,7 +821,9 @@
       "def": "215",
       "spd": "215",
       "dex": "215"
-    },
+    }
+          ],
+  "WAR Chain List 3": [
     {
       "name": "Xasy",
       "id": "2097823",
@@ -1199,7 +1203,9 @@
       "def": "652",
       "spd": "652",
       "dex": "654"
-    },
+    }
+          ],
+  "WAR Chain List 4": [
     {
       "name": "hypermegmeg",
       "id": "368042",
@@ -1599,7 +1605,9 @@
       "def": "1750",
       "spd": "1750",
       "dex": "1750"
-    },
+    }
+          ],
+  "WAR Chain List 5": [
     {
       "name": "Immense",
       "id": "590306",
@@ -1999,7 +2007,9 @@
       "def": "4925",
       "spd": "4925",
       "dex": "4925"
-    },
+    }
+          ],
+  "WAR Chain List 6": [
     {
       "name": "ulithian",
       "id": "1807242",
@@ -2419,7 +2429,9 @@
       "def": "10750",
       "spd": "10750",
       "dex": "10750"
-    },
+    }
+          ],
+  "WAR Chain List 7": [
     {
       "name": "LEP-Recon",
       "id": "440912",
