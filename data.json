@@ -439,7 +439,9 @@
       "def": "125",
       "spd": "125",
       "dex": "125"
-    },
+    }
+  ],
+  "War Chain List 2": [
     {
       "name": "SteelGiant55",
       "id": "",
@@ -899,7 +901,9 @@
       "def": "245",
       "spd": "245",
       "dex": "245"
-    },
+    }
+      ],
+  "War Chain List 2": [
     {
       "name": "rahuldugu",
       "id": "",
@@ -1319,7 +1323,9 @@
       "def": "787",
       "spd": "787",
       "dex": "789"
-    },
+    }
+    ],
+  "War Chain List 3": [
     {
       "name": "Relyks_Doog",
       "id": "2460665",
@@ -1689,7 +1695,9 @@
       "def": "2127",
       "spd": "2127",
       "dex": "2129"
-    },
+    }
+          ],
+  "War Chain List 4": [
     {
       "name": "Dismortis42",
       "id": "",
@@ -2109,7 +2117,9 @@
       "def": "5650",
       "spd": "5650",
       "dex": "5650"
-    },
+    }
+          ],
+  "War Chain List 5": [
     {
       "name": "TFTR-Kelly-",
       "id": "",
@@ -2639,7 +2649,9 @@
       "def": "19000",
       "spd": "19000",
       "dex": "19000"
-    },
+    }
+          ],
+  "War Chain List 6": [
     {
       "name": "TheSuperHiro",
       "id": "",
