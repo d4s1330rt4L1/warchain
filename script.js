@@ -46,8 +46,54 @@ async function loadListNames() {
   }
 }
 
+// Fetch FF scores for a list of player IDs from FFScouter
+async function fetchFFScores(ffKey, players) {
+    const ids = players.map(p => p.id).filter(Boolean);
+    if (!ids.length || !ffKey) return {};
+
+    const results = {};
+    const chunkSize = 205;
+
+    for (let i = 0; i < ids.length; i += chunkSize) {
+        const chunk = ids.slice(i, i + chunkSize);
+        try {
+            const res = await fetch(
+                `https://ffscouter.com/api/v1/get-stats?key=${ffKey}&targets=${chunk.join(",")}`
+            );
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                for (const entry of data) {
+                    results[String(entry.player_id)] = entry.fair_fight;
+                }
+            }
+        } catch (err) {
+            console.error("FFScouter fetch error:", err);
+        }
+    }
+
+    return results;
+}
+
+function formatFFScore(ff) {
+    if (ff === null || ff === undefined) {
+        return `<span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400">N/A</span>`;
+    }
+
+    let colorClass;
+    if (ff >= 2.5) {
+        colorClass = "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
+    } else if (ff >= 1.5) {
+        colorClass = "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
+    } else {
+        colorClass = "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
+    }
+
+    return `<span class="inline-flex items-center rounded-md ${colorClass} px-2 py-0.5 text-xs font-medium">${ff.toFixed(2)}x</span>`;
+}
+
 async function fetchData() {
     const apiKey = document.getElementById("api-key").value;
+    const ffKey = document.getElementById("ff-key").value.trim();
 
     const listSelectForError = document.getElementById("list-select");
     const selectedListForError = listSelectForError.value || 'None Selected';
@@ -60,6 +106,7 @@ async function fetchData() {
     }
 
     localStorage.setItem("apiKey", apiKey);
+    if (ffKey) localStorage.setItem("ffKey", ffKey);
 
     const listSelect = document.getElementById("list-select");
     const selectedList = listSelect.value;
@@ -69,7 +116,6 @@ async function fetchData() {
         errorLogly(validStoredInfo.name, validStoredInfo.level, "No list selected", 'None Selected');
         return;
     }
-
 
     const fetchButton = document.getElementById("fetch-button");
     fetchButton.disabled = true;
@@ -126,7 +172,6 @@ async function fetchData() {
             }
         }
 
-
         const response = await fetch("data.json");
         const data = await response.json();
         tableData = data[selectedList];
@@ -138,34 +183,34 @@ async function fetchData() {
             return;
         }
 
+        // Fetch FF scores and player statuses in parallel
+        const [ffScores, usersWithStatus] = await Promise.all([
+            ffKey ? fetchFFScores(ffKey, tableData) : Promise.resolve({}),
+            Promise.all(tableData.map(async (row) => {
+                const apiUrl = `https://api.torn.com/user/${row.id}?selections=basic&key=${apiKey}`;
+                try {
+                    const userResponse = await fetch(apiUrl);
+                    const userData = await userResponse.json();
 
-        const userPromises = tableData.map(async (row) => {
-            const apiUrl = `https://api.torn.com/user/${row.id}?selections=basic&key=${apiKey}`;
-            try {
-                const userResponse = await fetch(apiUrl);
-                const userData = await userResponse.json();
+                    if (userData.error) {
+                        console.error(`Error fetching data for user ${row.id}:`, userData.error.error);
+                        if (userData.error.code === 2 && !fetchError) {
+                            fetchError = `Invalid API Key used for target fetch (Code ${userData.error.code})`;
+                        } else if (!fetchError) {
+                            fetchError = `Target fetch error for ${row.id}: ${userData.error.error} (Code ${userData.error.code})`;
+                        }
+                        return { ...row, status: `Error (${userData.error.code})` };
+                    }
 
-                if (userData.error) {
-                     console.error(`Error fetching data for user ${row.id}:`, userData.error.error);
-                     if (userData.error.code === 2 && !fetchError) {
-                        fetchError = `Invalid API Key used for target fetch (Code ${userData.error.code})`;
-                     } else if (!fetchError) {
-                         fetchError = `Target fetch error for ${row.id}: ${userData.error.error} (Code ${userData.error.code})`;
-                     }
-                     return { ...row, status: `Error (${userData.error.code})` };
+                    const status = formatStatus(userData.status);
+                    return { ...row, status };
+                } catch (error) {
+                    console.error(`Network error fetching data for user ${row.id}:`, error);
+                    if (!fetchError) fetchError = `Network error during target fetch for ${row.id}: ${error.message}`;
+                    return { ...row, status: "Network Error" };
                 }
-
-                const status = formatStatus(userData.status);
-                return { ...row, status };
-            } catch (error) {
-                console.error(`Network error fetching data for user ${row.id}:`, error);
-                 if (!fetchError) fetchError = `Network error during target fetch for ${row.id}: ${error.message}`;
-                return { ...row, status: "Network Error" };
-            }
-        });
-
-        const usersWithStatus = await Promise.all(userPromises);
-
+            }))
+        ]);
 
         const sortedUsers = usersWithStatus.sort((a, b) => {
             if (a.status === "Okay" && b.status !== "Okay") return -1;
@@ -183,12 +228,17 @@ async function fetchData() {
 
         sortedUsers.forEach((user, index) => {
             const attackLink = createAttackLink(user.id, user.status);
-            const newRow = createTableRow(user, user.status, attackLink, index);
+            const ff = ffScores[String(user.id)] ?? null;
+            const newRow = createTableRow(user, user.status, attackLink, index, ff, !!ffKey);
             tableBody.innerHTML += newRow;
         });
 
         hideNoDataMessage();
         displayDataTable();
+
+        // Show/hide FF column header based on whether a key was provided
+        const ffHeader = document.getElementById("ff-header");
+        if (ffHeader) ffHeader.classList.toggle("hidden", !ffKey);
 
         clearInterval(statusUpdateInterval);
         statusUpdateInterval = setInterval(() => {
@@ -197,13 +247,12 @@ async function fetchData() {
 
     } catch (error) {
         console.error("Error fetching list data:", error);
-         if (!fetchError) fetchError = `Main list data fetch error: ${error.message}`;
+        if (!fetchError) fetchError = `Main list data fetch error: ${error.message}`;
         displayNoDataMessage();
     } finally {
         hideLoadingIndicator();
 
         const finalStoredInfo = getValidStoredUserInfo();
-
         const finalName = currentFetchUserName || finalStoredInfo.name || null;
         const finalLevel = currentFetchUserLevel !== null ? currentFetchUserLevel : finalStoredInfo.level;
         const finalError = fetchError || null;
@@ -281,7 +330,7 @@ function formatStatus(status) {
 function updateStatus() {
   const rows = document.querySelectorAll("#table-body tr");
   rows.forEach((row) => {
-    const statusCell = row.querySelector("td:nth-child(8)");
+    const statusCell = row.querySelector("td:nth-child(9)");
     if (!statusCell) return;
 
     const currentStatus = statusCell.textContent.trim();
@@ -298,7 +347,7 @@ function updateStatus() {
           const userIdMatch = profileLink.href.match(/XID=(\d+)/);
            if (userIdMatch && userIdMatch[1]) {
                 const userId = userIdMatch[1];
-                const attackLinkCell = row.querySelector("td:nth-child(9)");
+                const attackLinkCell = row.querySelector("td:nth-child(10)");
                 if (attackLinkCell) {
                    attackLinkCell.innerHTML = createAttackLink(userId, "Okay");
                 }
@@ -357,11 +406,19 @@ function populateAPIKey() {
     if (storedApiKey)
       document.getElementById("api-key").value = storedApiKey;
   }
+
+  const storedFFKey = localStorage.getItem("ffKey");
+  if (storedFFKey) {
+    document.getElementById("ff-key").value = storedFFKey;
+  }
 }
 
-function createTableRow(row, status, attackLink, index) {
+function createTableRow(row, status, attackLink, index, ff, showFF) {
   const isNotFirst = index > 0;
   const borderClass = isNotFirst ? 'border-t border-gray-200 dark:border-gray-700' : '';
+  const ffCell = showFF
+    ? `<td class="hidden px-3 py-3.5 text-sm lg:table-cell min-w-0 ${borderClass}">${formatFFScore(ff)}</td>`
+    : `<td class="hidden lg:table-cell ${borderClass}"></td>`;
 
   return `
     <tr>
@@ -375,6 +432,7 @@ function createTableRow(row, status, attackLink, index) {
         <div class="mt-1 flex flex-col text-gray-500 dark:text-gray-400 sm:block lg:hidden">
             <span>Level: ${row.lvl}</span>
             <span>Total: ${row.total}</span>
+            ${showFF ? `<span>FF: ${ff !== null && ff !== undefined ? ff.toFixed(2) + 'x' : 'N/A'}</span>` : ''}
         </div>
       </td>
       <td class="hidden px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400 lg:table-cell min-w-0 ${borderClass}">${row.lvl}</td>
@@ -383,6 +441,7 @@ function createTableRow(row, status, attackLink, index) {
       <td class="hidden px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400 lg:table-cell min-w-0 ${borderClass}">${row.def}</td>
       <td class="hidden px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400 lg:table-cell min-w-0 ${borderClass}">${row.spd}</td>
       <td class="hidden px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400 lg:table-cell min-w-0 ${borderClass}">${row.dex}</td>
+      ${ffCell}
       <td class="px-3 py-3.5 text-sm text-gray-500 dark:text-gray-400 min-w-0 ${borderClass}">
         <div class="sm:hidden w-40">${status}</div>
         <div class="hidden sm:block w-40">${status}</div>
