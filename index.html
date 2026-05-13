@@ -17,17 +17,213 @@ from { transform: rotate(0deg); }
 to { transform: rotate(360deg); }
 }
 .spin { animation: spin 1s linear infinite; }
+
+body.dark {
+  background-color: #0f0a0e;
+}
+
+/* Tactical background canvas */
+#war-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Only show tactical bg in dark mode */
+html:not(.dark) #war-bg { display: none; }
+
+#war-bg svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Corner brackets */
+#war-bg .bracket {
+  stroke: #f43f5e;
+  stroke-width: 1.5;
+  fill: none;
+  opacity: 0.45;
+}
+
+/* Grid lines */
+#war-bg .gl {
+  stroke: #be185d;
+  stroke-width: 0.5;
+  opacity: 0.12;
+}
+
+/* Diagonal slashes */
+#war-bg .sl {
+  stroke: #be185d;
+  stroke-width: 0.8;
+  opacity: 0.06;
+}
+
+/* Dots */
+#war-bg .dot {
+  fill: #f43f5e;
+  opacity: 0.18;
+}
+
+/* HUD labels */
+#war-bg .hud {
+  font-family: monospace;
+  font-size: 11px;
+  fill: #f43f5e;
+  opacity: 0.3;
+  letter-spacing: 2px;
+}
+
+/* Reticle */
+#war-bg .ret {
+  stroke: #f43f5e;
+  fill: none;
+  opacity: 0.22;
+}
+
+/* Scanlines */
+#war-bg .scan {
+  stroke: #f43f5e;
+  stroke-width: 22;
+  opacity: 0.025;
+}
+
+/* Light mode subtle dot grid as before */
+html:not(.dark) #light-bg { display: block; }
+html.dark #light-bg { display: none; }
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
 <script src="script.js?v=1.37"></script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 font-sans leading-normal text-gray-800 dark:text-gray-200 overflow-x-hidden">
-<div class="hidden sm:block sm:absolute sm:inset-y-0 sm:h-full sm:w-full">
+<body class="bg-gray-50 dark:bg-[#0f0a0e] font-sans leading-normal text-gray-800 dark:text-gray-200 overflow-x-hidden">
+
+<!-- Tactical dark background -->
+<div id="war-bg" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Scanlines -->
+    <line class="scan" x1="0" y1="22" x2="1440" y2="22"/>
+    <line class="scan" x1="0" y1="66" x2="1440" y2="66"/>
+    <line class="scan" x1="0" y1="110" x2="1440" y2="110"/>
+    <line class="scan" x1="0" y1="154" x2="1440" y2="154"/>
+    <line class="scan" x1="0" y1="198" x2="1440" y2="198"/>
+    <line class="scan" x1="0" y1="242" x2="1440" y2="242"/>
+    <line class="scan" x1="0" y1="286" x2="1440" y2="286"/>
+    <line class="scan" x1="0" y1="330" x2="1440" y2="330"/>
+    <line class="scan" x1="0" y1="374" x2="1440" y2="374"/>
+    <line class="scan" x1="0" y1="418" x2="1440" y2="418"/>
+    <line class="scan" x1="0" y1="462" x2="1440" y2="462"/>
+    <line class="scan" x1="0" y1="506" x2="1440" y2="506"/>
+    <line class="scan" x1="0" y1="550" x2="1440" y2="550"/>
+    <line class="scan" x1="0" y1="594" x2="1440" y2="594"/>
+    <line class="scan" x1="0" y1="638" x2="1440" y2="638"/>
+    <line class="scan" x1="0" y1="682" x2="1440" y2="682"/>
+    <line class="scan" x1="0" y1="726" x2="1440" y2="726"/>
+    <line class="scan" x1="0" y1="770" x2="1440" y2="770"/>
+    <line class="scan" x1="0" y1="814" x2="1440" y2="814"/>
+    <line class="scan" x1="0" y1="858" x2="1440" y2="858"/>
+
+    <!-- Vertical grid -->
+    <line class="gl" x1="120" y1="0" x2="120" y2="900"/>
+    <line class="gl" x1="240" y1="0" x2="240" y2="900"/>
+    <line class="gl" x1="360" y1="0" x2="360" y2="900"/>
+    <line class="gl" x1="480" y1="0" x2="480" y2="900"/>
+    <line class="gl" x1="600" y1="0" x2="600" y2="900"/>
+    <line class="gl" x1="720" y1="0" x2="720" y2="900"/>
+    <line class="gl" x1="840" y1="0" x2="840" y2="900"/>
+    <line class="gl" x1="960" y1="0" x2="960" y2="900"/>
+    <line class="gl" x1="1080" y1="0" x2="1080" y2="900"/>
+    <line class="gl" x1="1200" y1="0" x2="1200" y2="900"/>
+    <line class="gl" x1="1320" y1="0" x2="1320" y2="900"/>
+
+    <!-- Horizontal grid -->
+    <line class="gl" x1="0" y1="90" x2="1440" y2="90"/>
+    <line class="gl" x1="0" y1="180" x2="1440" y2="180"/>
+    <line class="gl" x1="0" y1="270" x2="1440" y2="270"/>
+    <line class="gl" x1="0" y1="360" x2="1440" y2="360"/>
+    <line class="gl" x1="0" y1="450" x2="1440" y2="450"/>
+    <line class="gl" x1="0" y1="540" x2="1440" y2="540"/>
+    <line class="gl" x1="0" y1="630" x2="1440" y2="630"/>
+    <line class="gl" x1="0" y1="720" x2="1440" y2="720"/>
+    <line class="gl" x1="0" y1="810" x2="1440" y2="810"/>
+
+    <!-- Diagonal slashes - left cluster -->
+    <line class="sl" x1="-100" y1="0" x2="400" y2="900"/>
+    <line class="sl" x1="60" y1="0" x2="560" y2="900"/>
+    <line class="sl" x1="220" y1="0" x2="720" y2="900"/>
+
+    <!-- Diagonal slashes - right cluster -->
+    <line class="sl" x1="880" y1="0" x2="1380" y2="900"/>
+    <line class="sl" x1="1040" y1="0" x2="1540" y2="900"/>
+    <line class="sl" x1="1200" y1="0" x2="1700" y2="900"/>
+
+    <!-- Grid intersection dots - top row -->
+    <circle class="dot" cx="120" cy="90" r="2"/>
+    <circle class="dot" cx="240" cy="90" r="2"/>
+    <circle class="dot" cx="360" cy="90" r="2"/>
+    <circle class="dot" cx="1080" cy="90" r="2"/>
+    <circle class="dot" cx="1200" cy="90" r="2"/>
+    <circle class="dot" cx="1320" cy="90" r="2"/>
+
+    <!-- Grid intersection dots - bottom row -->
+    <circle class="dot" cx="120" cy="810" r="2"/>
+    <circle class="dot" cx="240" cy="810" r="2"/>
+    <circle class="dot" cx="360" cy="810" r="2"/>
+    <circle class="dot" cx="1080" cy="810" r="2"/>
+    <circle class="dot" cx="1200" cy="810" r="2"/>
+    <circle class="dot" cx="1320" cy="810" r="2"/>
+
+    <!-- Top-left corner bracket -->
+    <polyline class="bracket" points="60,130 60,60 130,60"/>
+    <!-- Top-right corner bracket -->
+    <polyline class="bracket" points="1310,60 1380,60 1380,130"/>
+    <!-- Bottom-left corner bracket -->
+    <polyline class="bracket" points="60,770 60,840 130,840"/>
+    <!-- Bottom-right corner bracket -->
+    <polyline class="bracket" points="1310,840 1380,840 1380,770"/>
+
+    <!-- Extra inner brackets -->
+    <polyline class="bracket" points="100,160 100,100 160,100" style="opacity:0.2"/>
+    <polyline class="bracket" points="1280,100 1340,100 1340,160" style="opacity:0.2"/>
+    <polyline class="bracket" points="100,740 100,800 160,800" style="opacity:0.2"/>
+    <polyline class="bracket" points="1280,800 1340,800 1340,740" style="opacity:0.2"/>
+
+    <!-- Center reticle -->
+    <circle class="ret" cx="720" cy="450" r="70" stroke-width="1"/>
+    <circle class="ret" cx="720" cy="450" r="42" stroke-width="0.8"/>
+    <circle class="ret" cx="720" cy="450" r="6" stroke-width="1"/>
+    <!-- crosshairs -->
+    <line class="ret" x1="620" y1="450" x2="668" y2="450" stroke-width="1"/>
+    <line class="ret" x1="772" y1="450" x2="820" y2="450" stroke-width="1"/>
+    <line class="ret" x1="720" y1="350" x2="720" y2="398" stroke-width="1"/>
+    <line class="ret" x1="720" y1="502" x2="720" y2="550" stroke-width="1"/>
+    <!-- reticle tick marks -->
+    <line class="ret" x1="700" y1="382" x2="740" y2="382" stroke-width="0.6" opacity="0.15"/>
+    <line class="ret" x1="700" y1="518" x2="740" y2="518" stroke-width="0.6" opacity="0.15"/>
+
+    <!-- HUD corner labels -->
+    <text class="hud" x="76" y="56">WAR</text>
+    <text class="hud" x="1304" y="56" text-anchor="end">CHAIN HIT LIST</text>
+    <text class="hud" x="76" y="856">CLASSIFIED</text>
+    <text class="hud" x="1304" y="856" text-anchor="end">v1.37</text>
+    <!-- reticle labels -->
+    <text class="hud" x="608" y="454" text-anchor="end" style="font-size:10px">TGT</text>
+    <text class="hud" x="832" y="454" style="font-size:10px">LOCK</text>
+
+  </svg>
+</div>
+
+<!-- Light mode dot grid (original) -->
+<div id="light-bg" class="hidden sm:block sm:absolute sm:inset-y-0 sm:h-full sm:w-full" aria-hidden="true">
   <div class="relative h-full max-w-7xl w-full mx-auto">
     <svg class="absolute right-full transform translate-y-1/8 translate-x-1/8 lg:translate-x-1/4" width="404" height="784" fill="none" viewBox="0 0 404 784">
       <defs>
         <pattern id="left-pattern" x="0" y="0" width="28" height="24" patternUnits="userSpaceOnUse">
-          <polygon points="14,2 24,7 24,17 14,22 4,17 4,7" class="text-gray-200 dark:text-gray-800" fill="none" stroke="currentColor" stroke-width="1"></polygon>
+          <polygon points="14,2 24,7 24,17 14,22 4,17 4,7" fill="none" stroke="#d1d5db" stroke-width="1"></polygon>
         </pattern>
       </defs>
       <rect width="404" height="784" fill="url(#left-pattern)"></rect>
@@ -35,7 +231,7 @@ to { transform: rotate(360deg); }
     <svg class="absolute left-full transform -translate-y-1/8 -translate-x-1/8 lg:-translate-x-1/4" width="404" height="784" fill="none" viewBox="0 0 404 784">
       <defs>
         <pattern id="right-pattern" x="0" y="0" width="28" height="24" patternUnits="userSpaceOnUse">
-          <polygon points="14,2 24,7 24,17 14,22 4,17 4,7" class="text-gray-200 dark:text-gray-800" fill="none" stroke="currentColor" stroke-width="1"></polygon>
+          <polygon points="14,2 24,7 24,17 14,22 4,17 4,7" fill="none" stroke="#d1d5db" stroke-width="1"></polygon>
         </pattern>
       </defs>
       <rect width="404" height="784" fill="url(#right-pattern)"></rect>
@@ -43,11 +239,13 @@ to { transform: rotate(360deg); }
   </div>
 </div>
 
-<div class="relative flex flex-col min-h-screen py-12 px-2 sm:px-6 lg:px-8">
+<div class="relative z-10 flex flex-col min-h-screen py-12 px-2 sm:px-6 lg:px-8">
   <div class="flex items-center justify-center">
     <div class="flex flex-col justify-around">
       <div class="space-y-6 text-center text-gray-600 dark:text-gray-300">
-        <h1 class="sm:pt-16 text-4xl font-extrabold tracking-wider text-gray-700 dark:text-gray-200">We Are Rising</h1>
+        <h1 class="sm:pt-16 text-4xl font-extrabold tracking-wider text-gray-700 dark:text-gray-200">
+          We Are Rising
+        </h1>
         <h3 class="text-base font-medium tracking-wider">
           <div class="max-w-2xl mx-auto">
             <p>
@@ -70,11 +268,11 @@ to { transform: rotate(360deg); }
                 class="peer relative col-start-1 row-start-1 border-0 bg-transparent text-gray-900 dark:text-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 w-72 h-10 px-4 py-2"
                 placeholder="Torn API key" autocomplete="off"
               />
-              <div class="col-start-1 col-end-3 row-start-1 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 peer-focus:ring-2 peer-focus:ring-pink-600" aria-hidden="true"></div>
+              <div class="col-start-1 col-end-3 row-start-1 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-pink-900 peer-focus:ring-2 peer-focus:ring-pink-600" aria-hidden="true"></div>
               <div class="col-start-2 row-start-1 flex items-center">
-                <span class="h-4 w-px flex-none bg-gray-200" aria-hidden="true"></span>
+                <span class="h-4 w-px flex-none bg-gray-200 dark:bg-pink-900" aria-hidden="true"></span>
                 <label for="list-select" class="sr-only">List select</label>
-                <select id="list-select" name="list-select" class="rounded-md border-0 bg-transparent dark:bg-gray-900 py-1.5 pl-4 mr-1 pr-7 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-inset focus:ring-pink-600 sm:text-sm sm:leading-6"></select>
+                <select id="list-select" name="list-select" class="rounded-md border-0 bg-transparent dark:bg-transparent py-1.5 pl-4 mr-1 pr-7 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-inset focus:ring-pink-600 sm:text-sm sm:leading-6"></select>
               </div>
             </div>
 
@@ -83,7 +281,7 @@ to { transform: rotate(360deg); }
               <label for="ff-key" class="sr-only">FFScouter API key</label>
               <input
                 type="text" name="ff-key" id="ff-key"
-                class="block w-56 rounded-md border-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-pink-600 sm:text-sm sm:leading-6 h-10 px-4 py-2"
+                class="block w-56 rounded-md border-0 bg-white dark:bg-gray-900/60 dark:ring-pink-900 text-gray-900 dark:text-gray-300 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-pink-600 sm:text-sm sm:leading-6 h-10 px-4 py-2"
                 placeholder="FFScouter key (optional)" autocomplete="off"
               />
               <p class="mt-1 text-xs text-gray-400 dark:text-gray-500 text-left">
@@ -109,13 +307,13 @@ to { transform: rotate(360deg); }
             <a href="https://www.torn.com/preferences.php#tab=api?&step=addNewKey&title=warchain&type=1" target="_blank" class="font-extrabold text-pink-400 hover:text-pink-300 underline">here</a>
             and we'll bring you there!
           </p>
-          <div id="loading-indicator" class="fixed inset-0 flex items-center justify-center hidden">
+          <div id="loading-indicator" class="fixed inset-0 flex items-center justify-center hidden z-50">
             <div class="w-16 h-16 border-t-4 border-pink-600 border-solid rounded-full spin"></div>
           </div>
           <div id="data-table" class="py-4 px-4 sm:px-6 lg:px-8 text-left hidden">
-            <div class="-mx-4 mt-10 ring-1 ring-gray-300 sm:mx-0 sm:rounded-lg">
+            <div class="-mx-4 mt-10 ring-1 ring-gray-300 dark:ring-pink-900/40 sm:mx-0 sm:rounded-lg dark:bg-gray-900/50 backdrop-blur-sm">
               <div class="table-container overflow-x-auto w-full">
-                <table class="table-fixed max-w-full min-w-full divide-y divide-gray-300">
+                <table class="table-fixed max-w-full min-w-full divide-y divide-gray-300 dark:divide-pink-900/40">
                   <thead>
                     <tr>
                       <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-300 sm:pl-6">Player</th>
@@ -130,7 +328,7 @@ to { transform: rotate(360deg); }
                       <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6"><span class="sr-only">Attack</span></th>
                     </tr>
                   </thead>
-                  <tbody id="table-body"></tbody>
+                  <tbody id="table-body" class="divide-y divide-gray-200 dark:divide-pink-900/30"></tbody>
                 </table>
                 <p id="no-data-message" class="hidden px-3 py-3.5 text-sm text-gray-400 border-t border-gray-200">No data available.</p>
               </div>
@@ -158,7 +356,7 @@ to { transform: rotate(360deg); }
 </div>
 
 <div id="custom-popup-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+  <div class="bg-white dark:bg-gray-900 dark:ring-1 dark:ring-pink-900/50 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
     <p id="custom-popup-message" class="text-gray-800 dark:text-gray-200 mb-4"></p>
     <button id="custom-popup-close" class="w-full rounded-md bg-pink-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-pink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600">Close</button>
   </div>
