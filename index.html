@@ -18,8 +18,22 @@ to { transform: rotate(360deg); }
 }
 .spin { animation: spin 1s linear infinite; }
 
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+.pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.85; }
+  50% { opacity: 1; }
+  75% { opacity: 0.9; }
+}
+.flicker { animation: flicker 0.15s infinite; }
+
 body.dark {
-  background-color: #0f0a0e;
+  background-color: #0a0605;
 }
 
 /* Tactical background canvas */
@@ -41,55 +55,114 @@ html:not(.dark) #war-bg { display: none; }
   height: 100%;
 }
 
-/* Corner brackets */
-#war-bg .bracket {
-  stroke: #f43f5e;
-  stroke-width: 1.5;
+/* Aggressive border/corruption overlay */
+#war-bg .corruption {
+  stroke: #8b0000;
+  stroke-width: 2;
   fill: none;
-  opacity: 0.45;
+  opacity: 0.25;
 }
 
-/* Grid lines */
+/* Corner brackets - more aggressive */
+#war-bg .bracket {
+  stroke: #dc2626;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.7;
+}
+
+#war-bg .bracket-glow {
+  stroke: #dc2626;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.35;
+  filter: blur(2px);
+}
+
+/* Grid lines - heavier */
 #war-bg .gl {
-  stroke: #be185d;
+  stroke: #7f1d1d;
+  stroke-width: 0.7;
+  opacity: 0.25;
+}
+
+#war-bg .gl-alt {
+  stroke: #991b1b;
   stroke-width: 0.5;
   opacity: 0.12;
 }
 
-/* Diagonal slashes */
+/* Diagonal slashes - more intense */
 #war-bg .sl {
-  stroke: #be185d;
-  stroke-width: 0.8;
-  opacity: 0.06;
+  stroke: #991b1b;
+  stroke-width: 1.2;
+  opacity: 0.15;
 }
 
-/* Dots */
+/* Dots - strategic positions */
 #war-bg .dot {
-  fill: #f43f5e;
-  opacity: 0.18;
+  fill: #dc2626;
+  opacity: 0.5;
+}
+
+#war-bg .dot-dim {
+  fill: #7f1d1d;
+  opacity: 0.25;
 }
 
 /* HUD labels */
 #war-bg .hud {
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
   font-size: 11px;
-  fill: #f43f5e;
-  opacity: 0.3;
+  fill: #dc2626;
+  opacity: 0.6;
+  letter-spacing: 3px;
+  font-weight: bold;
+}
+
+#war-bg .hud-dim {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  fill: #7f1d1d;
+  opacity: 0.35;
   letter-spacing: 2px;
 }
 
 /* Reticle */
 #war-bg .ret {
-  stroke: #f43f5e;
+  stroke: #dc2626;
   fill: none;
-  opacity: 0.22;
+  opacity: 0.4;
+}
+
+#war-bg .ret-pulse {
+  stroke: #dc2626;
+  fill: none;
+  opacity: 0.5;
 }
 
 /* Scanlines */
 #war-bg .scan {
-  stroke: #f43f5e;
-  stroke-width: 22;
-  opacity: 0.025;
+  stroke: #1a1a1a;
+  stroke-width: 20;
+  opacity: 0.08;
+}
+
+#war-bg .scan-red {
+  stroke: #dc2626;
+  stroke-width: 24;
+  opacity: 0.03;
+}
+
+/* Damage/burn marks */
+#war-bg .damage {
+  fill: #4c0519;
+  opacity: 0.15;
+}
+
+#war-bg .burn {
+  fill: #7f1d1d;
+  opacity: 0.1;
 }
 
 /* Light mode subtle dot grid as before */
@@ -99,13 +172,23 @@ html.dark #light-bg { display: none; }
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
 <script src="script.js?v=1.37"></script>
 </head>
-<body class="bg-gray-50 dark:bg-[#0f0a0e] font-sans leading-normal text-gray-800 dark:text-gray-200 overflow-x-hidden">
+<body class="bg-gray-50 dark:bg-[#0a0605] font-sans leading-normal text-gray-800 dark:text-gray-200 overflow-x-hidden">
 
-<!-- Tactical dark background -->
+<!-- Tactical dark background - WAR THEME -->
 <div id="war-bg" aria-hidden="true">
   <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
 
-    <!-- Scanlines -->
+    <!-- Base corruption layer -->
+    <rect x="0" y="0" width="1440" height="900" fill="#0a0605" opacity="1"/>
+
+    <!-- Damage marks - scattered burns -->
+    <circle class="damage" cx="150" cy="120" r="40"/>
+    <circle class="damage" cx="1320" cy="250" r="35"/>
+    <circle class="burn" cx="450" cy="750" r="60"/>
+    <circle class="burn" cx="1100" cy="650" r="45"/>
+    <ellipse class="damage" cx="300" cy="650" rx="50" ry="30"/>
+
+    <!-- Scanlines - dual layer -->
     <line class="scan" x1="0" y1="22" x2="1440" y2="22"/>
     <line class="scan" x1="0" y1="66" x2="1440" y2="66"/>
     <line class="scan" x1="0" y1="110" x2="1440" y2="110"/>
@@ -127,7 +210,13 @@ html.dark #light-bg { display: none; }
     <line class="scan" x1="0" y1="814" x2="1440" y2="814"/>
     <line class="scan" x1="0" y1="858" x2="1440" y2="858"/>
 
-    <!-- Vertical grid -->
+    <!-- Red scanline overlay -->
+    <line class="scan-red" x1="0" y1="45" x2="1440" y2="45"/>
+    <line class="scan-red" x1="0" y1="135" x2="1440" y2="135"/>
+    <line class="scan-red" x1="0" y1="315" x2="1440" y2="315"/>
+    <line class="scan-red" x1="0" y1="585" x2="1440" y2="585"/>
+
+    <!-- Vertical grid - primary -->
     <line class="gl" x1="120" y1="0" x2="120" y2="900"/>
     <line class="gl" x1="240" y1="0" x2="240" y2="900"/>
     <line class="gl" x1="360" y1="0" x2="360" y2="900"/>
@@ -140,6 +229,16 @@ html.dark #light-bg { display: none; }
     <line class="gl" x1="1200" y1="0" x2="1200" y2="900"/>
     <line class="gl" x1="1320" y1="0" x2="1320" y2="900"/>
 
+    <!-- Vertical grid - secondary alternates -->
+    <line class="gl-alt" x1="60" y1="0" x2="60" y2="900"/>
+    <line class="gl-alt" x1="180" y1="0" x2="180" y2="900"/>
+    <line class="gl-alt" x1="300" y1="0" x2="300" y2="900"/>
+    <line class="gl-alt" x1="420" y1="0" x2="420" y2="900"/>
+    <line class="gl-alt" x1="660" y1="0" x2="660" y2="900"/>
+    <line class="gl-alt" x1="780" y1="0" x2="780" y2="900"/>
+    <line class="gl-alt" x1="1140" y1="0" x2="1140" y2="900"/>
+    <line class="gl-alt" x1="1260" y1="0" x2="1260" y2="900"/>
+
     <!-- Horizontal grid -->
     <line class="gl" x1="0" y1="90" x2="1440" y2="90"/>
     <line class="gl" x1="0" y1="180" x2="1440" y2="180"/>
@@ -151,10 +250,24 @@ html.dark #light-bg { display: none; }
     <line class="gl" x1="0" y1="720" x2="1440" y2="720"/>
     <line class="gl" x1="0" y1="810" x2="1440" y2="810"/>
 
+    <!-- Horizontal grid - alternates -->
+    <line class="gl-alt" x1="0" y1="45" x2="1440" y2="45"/>
+    <line class="gl-alt" x1="0" y1="135" x2="1440" y2="135"/>
+    <line class="gl-alt" x1="0" y1="225" x2="1440" y2="225"/>
+    <line class="gl-alt" x1="0" y1="315" x2="1440" y2="315"/>
+    <line class="gl-alt" x1="0" y1="495" x2="1440" y2="495"/>
+    <line class="gl-alt" x1="0" y1="585" x2="1440" y2="585"/>
+    <line class="gl-alt" x1="0" y1="765" x2="1440" y2="765"/>
+    <line class="gl-alt" x1="0" y1="855" x2="1440" y2="855"/>
+
     <!-- Diagonal slashes - left cluster -->
     <line class="sl" x1="-100" y1="0" x2="400" y2="900"/>
     <line class="sl" x1="60" y1="0" x2="560" y2="900"/>
     <line class="sl" x1="220" y1="0" x2="720" y2="900"/>
+
+    <!-- Diagonal slashes - center -->
+    <line class="sl" x1="400" y1="0" x2="900" y2="900"/>
+    <line class="sl" x1="640" y1="0" x2="1140" y2="900"/>
 
     <!-- Diagonal slashes - right cluster -->
     <line class="sl" x1="880" y1="0" x2="1380" y2="900"/>
@@ -162,57 +275,103 @@ html.dark #light-bg { display: none; }
     <line class="sl" x1="1200" y1="0" x2="1700" y2="900"/>
 
     <!-- Grid intersection dots - top row -->
-    <circle class="dot" cx="120" cy="90" r="2"/>
-    <circle class="dot" cx="240" cy="90" r="2"/>
-    <circle class="dot" cx="360" cy="90" r="2"/>
-    <circle class="dot" cx="1080" cy="90" r="2"/>
-    <circle class="dot" cx="1200" cy="90" r="2"/>
-    <circle class="dot" cx="1320" cy="90" r="2"/>
+    <circle class="dot" cx="120" cy="90" r="2.5"/>
+    <circle class="dot" cx="240" cy="90" r="2.5"/>
+    <circle class="dot" cx="360" cy="90" r="2.5"/>
+    <circle class="dot" cx="600" cy="90" r="2.5"/>
+    <circle class="dot" cx="840" cy="90" r="2.5"/>
+    <circle class="dot" cx="1080" cy="90" r="2.5"/>
+    <circle class="dot" cx="1200" cy="90" r="2.5"/>
+    <circle class="dot" cx="1320" cy="90" r="2.5"/>
+
+    <!-- Grid intersection dots - middle row -->
+    <circle class="dot-dim" cx="120" cy="450" r="2"/>
+    <circle class="dot" cx="360" cy="450" r="2.5"/>
+    <circle class="dot-dim" cx="600" cy="450" r="2"/>
+    <circle class="dot" cx="720" cy="450" r="3"/>
+    <circle class="dot-dim" cx="840" cy="450" r="2"/>
+    <circle class="dot" cx="1080" cy="450" r="2.5"/>
+    <circle class="dot-dim" cx="1320" cy="450" r="2"/>
 
     <!-- Grid intersection dots - bottom row -->
-    <circle class="dot" cx="120" cy="810" r="2"/>
-    <circle class="dot" cx="240" cy="810" r="2"/>
-    <circle class="dot" cx="360" cy="810" r="2"/>
-    <circle class="dot" cx="1080" cy="810" r="2"/>
-    <circle class="dot" cx="1200" cy="810" r="2"/>
-    <circle class="dot" cx="1320" cy="810" r="2"/>
+    <circle class="dot" cx="120" cy="810" r="2.5"/>
+    <circle class="dot" cx="240" cy="810" r="2.5"/>
+    <circle class="dot" cx="360" cy="810" r="2.5"/>
+    <circle class="dot" cx="600" cy="810" r="2.5"/>
+    <circle class="dot" cx="840" cy="810" r="2.5"/>
+    <circle class="dot" cx="1080" cy="810" r="2.5"/>
+    <circle class="dot" cx="1200" cy="810" r="2.5"/>
+    <circle class="dot" cx="1320" cy="810" r="2.5"/>
 
-    <!-- Top-left corner bracket -->
+    <!-- Border corruption - top -->
+    <polyline class="corruption" points="0,10 100,8 200,12 300,9 400,11 500,10 600,9 700,11 800,10 900,12 1000,9 1100,11 1200,10 1300,8 1440,12"/>
+    <!-- Border corruption - bottom -->
+    <polyline class="corruption" points="0,888 150,890 280,886 420,892 560,887 720,890 880,886 1020,891 1150,888 1280,892 1440,889"/>
+    <!-- Border corruption - left -->
+    <polyline class="corruption" points="10,0 8,120 12,240 9,360 11,480 10,600 9,720 11,840 8,900"/>
+    <!-- Border corruption - right -->
+    <polyline class="corruption" points="1430,0 1432,150 1428,300 1433,450 1429,600 1432,750 1430,900"/>
+
+    <!-- Top-left corner bracket - main -->
     <polyline class="bracket" points="60,130 60,60 130,60"/>
-    <!-- Top-right corner bracket -->
+    <polyline class="bracket-glow" points="55,135 55,55 135,55"/>
+    
+    <!-- Top-right corner bracket - main -->
     <polyline class="bracket" points="1310,60 1380,60 1380,130"/>
-    <!-- Bottom-left corner bracket -->
+    <polyline class="bracket-glow" points="1305,55 1385,55 1385,135"/>
+    
+    <!-- Bottom-left corner bracket - main -->
     <polyline class="bracket" points="60,770 60,840 130,840"/>
-    <!-- Bottom-right corner bracket -->
+    <polyline class="bracket-glow" points="55,765 55,845 135,845"/>
+    
+    <!-- Bottom-right corner bracket - main -->
     <polyline class="bracket" points="1310,840 1380,840 1380,770"/>
+    <polyline class="bracket-glow" points="1305,845 1385,845 1385,765"/>
 
     <!-- Extra inner brackets -->
-    <polyline class="bracket" points="100,160 100,100 160,100" style="opacity:0.2"/>
-    <polyline class="bracket" points="1280,100 1340,100 1340,160" style="opacity:0.2"/>
-    <polyline class="bracket" points="100,740 100,800 160,800" style="opacity:0.2"/>
-    <polyline class="bracket" points="1280,800 1340,800 1340,740" style="opacity:0.2"/>
+    <polyline class="bracket" points="100,160 100,100 160,100" style="opacity:0.35"/>
+    <polyline class="bracket" points="1280,100 1340,100 1340,160" style="opacity:0.35"/>
+    <polyline class="bracket" points="100,740 100,800 160,800" style="opacity:0.35"/>
+    <polyline class="bracket" points="1280,800 1340,800 1340,740" style="opacity:0.35"/>
 
-    <!-- Center reticle -->
-    <circle class="ret" cx="720" cy="450" r="70" stroke-width="1"/>
-    <circle class="ret" cx="720" cy="450" r="42" stroke-width="0.8"/>
-    <circle class="ret" cx="720" cy="450" r="6" stroke-width="1"/>
-    <!-- crosshairs -->
-    <line class="ret" x1="620" y1="450" x2="668" y2="450" stroke-width="1"/>
-    <line class="ret" x1="772" y1="450" x2="820" y2="450" stroke-width="1"/>
-    <line class="ret" x1="720" y1="350" x2="720" y2="398" stroke-width="1"/>
-    <line class="ret" x1="720" y1="502" x2="720" y2="550" stroke-width="1"/>
+    <!-- Center reticle - expanded and more aggressive -->
+    <circle class="ret-pulse" cx="720" cy="450" r="90" stroke-width="2"/>
+    <circle class="ret" cx="720" cy="450" r="70" stroke-width="1.2"/>
+    <circle class="ret" cx="720" cy="450" r="42" stroke-width="1"/>
+    <circle class="ret" cx="720" cy="450" r="6" stroke-width="1.5"/>
+    
+    <!-- crosshairs - extended -->
+    <line class="ret" x1="600" y1="450" x2="680" y2="450" stroke-width="1.5"/>
+    <line class="ret" x1="760" y1="450" x2="840" y2="450" stroke-width="1.5"/>
+    <line class="ret" x1="720" y1="330" x2="720" y2="410" stroke-width="1.5"/>
+    <line class="ret" x1="720" y1="490" x2="720" y2="570" stroke-width="1.5"/>
+    
     <!-- reticle tick marks -->
-    <line class="ret" x1="700" y1="382" x2="740" y2="382" stroke-width="0.6" opacity="0.15"/>
-    <line class="ret" x1="700" y1="518" x2="740" y2="518" stroke-width="0.6" opacity="0.15"/>
+    <line class="ret" x1="695" y1="382" x2="745" y2="382" stroke-width="0.8" opacity="0.3"/>
+    <line class="ret" x1="695" y1="518" x2="745" y2="518" stroke-width="0.8" opacity="0.3"/>
+    <line class="ret" x1="652" y1="450" x2="652" y2="455" stroke-width="1" opacity="0.3"/>
+    <line class="ret" x1="788" y1="450" x2="788" y2="455" stroke-width="1" opacity="0.3"/>
 
-    <!-- HUD corner labels -->
-    <text class="hud" x="76" y="56">WAR</text>
-    <text class="hud" x="1304" y="56" text-anchor="end">CHAIN HIT LIST</text>
-    <text class="hud" x="76" y="856">CLASSIFIED</text>
-    <text class="hud" x="1304" y="856" text-anchor="end">v1.37</text>
+    <!-- HUD corner labels - main -->
+    <text class="hud" x="76" y="50">W.A.R</text>
+    <text class="hud" x="1304" y="50" text-anchor="end">CHAIN HIT</text>
+    <text class="hud" x="76" y="862">█ CLASSIFIED</text>
+    <text class="hud" x="1304" y="862" text-anchor="end">v1.37 █</text>
+    
     <!-- reticle labels -->
-    <text class="hud" x="608" y="454" text-anchor="end" style="font-size:10px">TGT</text>
-    <text class="hud" x="832" y="454" style="font-size:10px">LOCK</text>
+    <text class="hud" x="600" y="454" text-anchor="end" style="font-size:10px">█TGT</text>
+    <text class="hud" x="840" y="454" style="font-size:10px">LOCK█</text>
+
+    <!-- Additional tactical markers -->
+    <text class="hud-dim" x="120" y="100" style="font-size:8px">GRID</text>
+    <text class="hud-dim" x="1320" y="900" style="font-size:8px">SYS.OK</text>
+    <text class="hud-dim" x="50" y="450" text-anchor="start" style="font-size:9px">ACTIVE</text>
+    <text class="hud-dim" x="1390" y="450" text-anchor="end" style="font-size:9px">READY</text>
+
+    <!-- Scanline bars with red tint -->
+    <rect x="0" y="120" width="1440" height="3" fill="#8b0000" opacity="0.1"/>
+    <rect x="0" y="450" width="1440" height="2" fill="#8b0000" opacity="0.08"/>
+    <rect x="0" y="780" width="1440" height="2" fill="#8b0000" opacity="0.08"/>
 
   </svg>
 </div>
@@ -265,14 +424,15 @@ html.dark #light-bg { display: none; }
             <div class="grid grid-cols-1 sm:flex-auto px-2">
               <input
                 type="text" name="api-key" id="api-key"
-                class="peer relative col-start-1 row-start-1 border-0 bg-transparent text-gray-900 dark:text-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 w-72 h-10 px-4 py-2"
+                class="peer relative col-start-1 row-start-1 border-0 bg-transparent text-gray-900 dark:text-gray-300 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 w-72 h-10 px-4"
                 placeholder="Torn API key" autocomplete="off"
               />
               <div class="col-start-1 col-end-3 row-start-1 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-pink-900 peer-focus:ring-2 peer-focus:ring-pink-600" aria-hidden="true"></div>
               <div class="col-start-2 row-start-1 flex items-center">
                 <span class="h-4 w-px flex-none bg-gray-200 dark:bg-pink-900" aria-hidden="true"></span>
                 <label for="list-select" class="sr-only">List select</label>
-                <select id="list-select" name="list-select" class="rounded-md border-0 bg-transparent dark:bg-transparent py-1.5 pl-4 mr-1 pr-7 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-inset focus:ring-pink-600 sm:text-sm sm:leading-6"></select>
+                <select id="list-select" name="list-select" class="rounded-md border-0 bg-transparent dark:bg-transparent py-1.5 pl-4 mr-1 pr-7 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-pink-600">
+                </select>
               </div>
             </div>
 
@@ -281,7 +441,7 @@ html.dark #light-bg { display: none; }
               <label for="ff-key" class="sr-only">FFScouter API key</label>
               <input
                 type="text" name="ff-key" id="ff-key"
-                class="block w-56 rounded-md border-0 bg-white dark:bg-gray-900/60 dark:ring-pink-900 text-gray-900 dark:text-gray-300 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-pink-600 sm:text-sm sm:leading-6 h-10 px-4 py-2"
+                class="block w-56 rounded-md border-0 bg-white dark:bg-gray-900/60 dark:ring-pink-900 text-gray-900 dark:text-gray-300 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-pink-600"
                 placeholder="FFScouter key (optional)" autocomplete="off"
               />
               <p class="mt-1 text-xs text-gray-400 dark:text-gray-500 text-left">
@@ -293,7 +453,7 @@ html.dark #light-bg { display: none; }
             <div class="mt-3 sm:mt-0 sm:flex-shrink-0 px-2">
               <button
                 type="submit" id="fetch-button"
-                class="block w-full rounded-md bg-pink-600 text-center text-sm font-semibold text-white shadow-sm hover:bg-pink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600 h-10 px-4 py-2"
+                class="block w-full rounded-md bg-pink-600 text-center text-sm font-semibold text-white shadow-sm hover:bg-pink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600"
                 onclick="fetchData(); return false;"
               >Fetch</button>
             </div>
